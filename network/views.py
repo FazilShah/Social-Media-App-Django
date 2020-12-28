@@ -106,5 +106,10 @@ def postview(request, post_id):
     if request.method == 'GET':
         return JsonResponse(post1.serialize())
 
+
+def userview(request, username):
+    user = User.objects.get(username=username)
+    if request.method == 'GET':
+        return JsonResponse(user.serialize())
     
     

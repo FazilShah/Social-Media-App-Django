@@ -5,7 +5,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function get_post(post_id){
     document.querySelector('#posts-view').style.display = 'none';
-    document.querySelector('#post-detail').style.display = 'block'
+    document.querySelector('#post-detail').style.display = 'block';
+    document.querySelector('#user-view').style.display = 'none';
+    document.querySelector('#user-posts-view').style.display = 'none';
     fetch(`/post/${post_id}`)
     .then(response => response.json())
     .then(post => {
@@ -31,7 +33,9 @@ function get_post(post_id){
 function get_posts(){
 
     document.querySelector('#posts-view').style.display = 'block';
-    document.querySelector('#post-detail').style.display = 'none'
+    document.querySelector('#post-detail').style.display = 'none';
+    document.querySelector('#user-view').style.display = 'none';
+    document.querySelector('#user-posts-view').style.display = 'none';
     fetch('/posts')
     .then(response => response.json())
     .then(posts => {
@@ -43,6 +47,7 @@ function get_posts(){
             const heading = document.createElement('h4');
             heading.innerHTML = `${post.author}`;
             div.append(heading);
+            heading.addEventListener('click', () => get_user(post.author));
             const contenty =document.createElement('p');
             contenty.innerHTML = `${post.content}`;
             div.append(contenty);
@@ -57,7 +62,7 @@ function get_posts(){
             
 
             document.querySelector('#posts-view').append(div);
-            div.addEventListener('click', () => get_post(`${post.id}`));
+            contenty.addEventListener('click', () => get_post(`${post.id}`));
 
         });
         
@@ -70,6 +75,7 @@ function get_posts(){
 
 
 function post(event){
+
     event.preventDefault();
 
     const body = document.querySelector('#content').value;
@@ -90,3 +96,54 @@ function post(event){
 
 
 }
+
+function get_user(username){
+    document.querySelector('#posts-view').style.display = 'none';
+    document.querySelector('#post-detail').style.display = 'none';
+    document.querySelector('#user-view').style.display = 'block';
+    document.querySelector('#user-posts-view').style.display = 'none';
+    fetch(`user/${username}`)
+    .then(response => response.json())
+    .then(user => {
+        console.log(user);
+        const div = document.createElement('div');
+        const heading = document.createElement('h1');
+        heading.innerHTML = `${user.username}`;
+        div.append(heading);
+        const followers = document.createElement('h5');
+        followers.innerHTML = `Followers: ${user.followers}`;
+        div.append(followers);
+        const following = document.createElement('h5');
+        following.innerHTML = `Following: ${user.following}`;
+        div.append(following);
+        
+        document.querySelector('#user-view').append(div);
+        load_user_posts(user.posts);
+        
+    })
+
+    
+}
+
+function load_user_posts(posts){
+    document.querySelector('#posts-view').style.display = 'none';
+    document.querySelector('#post-detail').style.display = 'block';
+    document.querySelector('#user-view').style.display = 'block';
+    document.querySelector('#user-posts-view').style.display = 'block';
+    posts.forEach(post => {
+        const div = document.createElement('div');
+        div.style.borderStyle = 'solid';
+        const heading = document.createElement('h5');
+        heading.innerHTML = `${post.content}`;
+        div.append(heading);
+        const dat = document.createElement('p');
+        dat.innerHTML = `${post.date}`;
+        div.append(dat);
+        const lik = document.createElement('p');
+        lik.innerHTML = `Likes: ${post.likes}`;
+        div.append(lik)
+        document.querySelector('#user-posts-view').append(div);
+    })
+}
+
+

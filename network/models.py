@@ -5,7 +5,27 @@ from django.utils import timezone
 
 
 class User(AbstractUser):
-    pass
+    followers = models.IntegerField(default=0)
+    following = models.IntegerField(default=0)
+
+
+    def serialize(self):
+        return {
+            "followers":self.followers,
+            "following":self.following,
+            "username":self.username,
+            "posts":[{
+                "content":post.content,
+                "date":post.dateposted.strftime("%b %#d %Y, %#I:%M %p"),
+                "likes":post.likes
+            } for post in Post.objects.filter(author_id=self.id)]
+        }
+
+
+
+
+    
+    
 
 
 class Post(models.Model):
