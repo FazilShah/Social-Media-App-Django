@@ -1,6 +1,12 @@
+
 {% extends "network/layout.html" %}
+{% load static %}
+{% block js %}
+<script src="{% static 'network/index.js '%}"></script>
+{% endblock %}
 
 {% block body %}
+
     <div id="post-form">
         <form id="post-post">
             <div class="form-group">
@@ -11,18 +17,9 @@
             </div>
         </form>
     </div>
-    <div id="post-detail">
+    
 
-    </div>
-
-    <div id="user-view">
-
-    </div>
-    <div id="user-posts-view">
-        <br>
-        <h4>All Posts</h4>
-        <br>
-    </div>
+   
   
     <div id="posts-view" class="card">
         
@@ -31,6 +28,7 @@
         
 
     </div>
+    
    
    
 {% endblock %}

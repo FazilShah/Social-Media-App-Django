@@ -1,0 +1,29 @@
+
+{% extends "network/layout.html" %}
+{% load static %}
+
+{% block js %}
+
+<script src="{% static 'network/follow.js' %}"></script>
+
+{% endblock %}
+
+{% block body %}
+
+<div id="post-form">
+    <form id="post-post">
+        <div class="form-group">
+            <textarea name="content" id="content" cols="100" rows="5" placeholder="What are you thinking?"></textarea>
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Post" class="btn btn-primary">
+        </div>
+    </form>
+</div>
+
+
+<div id="following-posts">
+
+</div>
+
+{% endblock %}

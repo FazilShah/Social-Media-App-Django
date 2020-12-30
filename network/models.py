@@ -9,16 +9,27 @@ class User(AbstractUser):
     following = models.IntegerField(default=0)
 
 
+    def __str__(self):
+        return self.username
+
+
     def serialize(self):
+        
         return {
             "followers":self.followers,
             "following":self.following,
             "username":self.username,
+            "id":self.id,
             "posts":[{
                 "content":post.content,
                 "date":post.dateposted.strftime("%b %#d %Y, %#I:%M %p"),
-                "likes":post.likes
-            } for post in Post.objects.filter(author_id=self.id)]
+                "likes":post.likes,
+                "id":post.id
+            } for post in Post.objects.filter(author_id=self.id)],
+
+            
+
+            
         }
 
 
@@ -67,6 +78,27 @@ class Comment(models.Model):
             "post":self.related_post
 
             }
+
+
+class Followers(models.Model):
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='following1')
+    following_user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='followers1')
+
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user_id','following_user_id'], name="unique followers")
+        ]
+
+    
+    def __str__(self):
+        return self.user_id.username
+
+    
+
+    
+   
+
 
     
 

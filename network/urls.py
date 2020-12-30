@@ -12,4 +12,10 @@ urlpatterns = [
     path("post/<int:post_id>", views.postview, name = 'postview'),
     path('posts', views.get_posts, name = 'getposts'),
     path('user/<str:username>', views.userview, name = 'userview'),
+    path('user/<int:user_id>/<str:fol>', views.follow, name = 'follow'),
+    path('followers', views.followed_posts, name='followers'),
+    path('<str:username>', views.display_user, name = 'display_user'),
+    path('<str:username>/<int:post_id>', views.load_post, name='load_post'),
+    path('following/', views.follow_view, name='following')
+    
 ]

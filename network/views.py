@@ -4,15 +4,26 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 import json
-from .models import User, Post
+from .models import User, Post, Followers
 import datetime
 from django.views.decorators.csrf import csrf_exempt
 
 
 
+
 def index(request):
     posts = Post.objects.all()
-    return render(request, "network/index.html")
+    current_user = User.objects.filter(username = request.user).first()
+    return render(request, "network/index.html",{'usery':current_user})
+
+def display_user(request, username):
+    return render(request, 'network/userview.html')
+
+def load_post(request, username, post_id):
+    return render(request, 'network/postview.html')
+
+def follow_view(request):
+    return render(request, 'network/followlist.html')
 
 
 def login_view(request):
@@ -109,7 +120,37 @@ def postview(request, post_id):
 
 def userview(request, username):
     user = User.objects.get(username=username)
+    requesting_user = request.user
+    data = user.serialize()
+    if(user == requesting_user):
+        check = True
+    else:
+        check = False
+    data['check'] = check
     if request.method == 'GET':
-        return JsonResponse(user.serialize())
+        return JsonResponse(data)
+        
     
+
+
+@csrf_exempt
+def follow(request, user_id, fol):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        user = data.get('to follow')
+        Followers.objects.create(user_id = User.objects.get(pk=user_id), following_user_id = User.objects.get(pk=request.user.id))
+        return JsonResponse({"message":"followed!"}, status=201)
+    
+    else:
+        return JsonResponse({"error":"error"})
+
+
+def followed_posts(request):
+    data = User.objects.get(pk=request.user.id)
+    followers = data.followers1.all()
+    users = [User.objects.get(username=follower) for follower in followers]
+    return JsonResponse([user.serialize() for user in users], safe=False)
+    
+
+
     
