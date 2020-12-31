@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", ()=>{
     load_followed_posts();
+    document.querySelector('#post-post').addEventListener('submit', post);
 });
 
 function load_followed_posts(){
@@ -25,6 +26,10 @@ function load_followed_posts(){
                 const dat = document.createElement('p');
                 dat.innerHTML = `${post.date}`;
                 div.append(dat);
+                const button = document.createElement('button');
+                button.innerHTML = 'Like';
+                button.className = "btn btn-primary";
+                div.append(button);
                 const lik = document.createElement('p');
                 lik.innerHTML = `Likes: ${post.likes}`;
                 div.append(lik);
@@ -34,3 +39,27 @@ function load_followed_posts(){
     ) })
 }
 
+
+function post(event){
+
+    event.preventDefault();
+
+    const body = document.querySelector('#content').value;
+    fetch("/post", {
+        method:"POST",
+        body: JSON.stringify({
+            content:body,
+
+        })
+    })
+    .then(response => response.json())
+    .then(result => {
+        console.log(result)
+    })
+    .catch((error) => console.log(error));
+
+    document.querySelector("#content").value = "";
+   
+
+
+}

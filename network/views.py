@@ -7,14 +7,15 @@ import json
 from .models import User, Post, Followers
 import datetime
 from django.views.decorators.csrf import csrf_exempt
-
+from django.core.paginator import Paginator
 
 
 
 def index(request):
     posts = Post.objects.all()
-    current_user = User.objects.filter(username = request.user).first()
-    return render(request, "network/index.html",{'usery':current_user})
+    paginator = Paginator(posts,10)
+    num_pages = [page for page in range(1, paginator.num_pages+1)]
+    return render(request, "network/index.html",{'pages':num_pages})
 
 def display_user(request, username):
     return render(request, 'network/userview.html')
@@ -79,8 +80,11 @@ def register(request):
 
 
 def get_posts(request):
-    posts = Post.objects.all()
-    return JsonResponse([post.serialize() for post in posts], safe=False)
+    page_number = int(request.GET.get('page') or 1)
+    posts = Post.objects.all().order_by("-dateposted")
+    paginator = Paginator(posts, 10)
+    pag = paginator.get_page(page_number)
+    return JsonResponse([post.serialize() for post in pag], safe=False)
 
 @csrf_exempt
 def create_post(request):
@@ -111,13 +115,22 @@ def create_post(request):
 
     return JsonResponse({"message": "Post Successfully added!"}, status=201)
 
-
+@csrf_exempt
 def postview(request, post_id):
     post1 = Post.objects.get(pk=post_id)
     if request.method == 'GET':
         return JsonResponse(post1.serialize())
 
+@csrf_exempt
+def like(request, post_id):
+    
+    if request.method == 'POST':
+        post = Post.objects.get(pk=post_id)
+        post.likes +=1
+        post.save()
+        return JsonResponse({'message':'liked succcessfuly'})
 
+@csrf_exempt
 def userview(request, username):
     user = User.objects.get(username=username)
     requesting_user = request.user

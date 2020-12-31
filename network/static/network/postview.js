@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     id = window.location.href.split("/")[4]
     get_post(id);
+    document.querySelector('#post-post').addEventListener('submit', post);
 })
 
 
@@ -25,4 +26,30 @@ function get_post(post_id){
         div.append(liky);
         document.querySelector('#postdetail').innerHTML = div.innerHTML;
     })
+}
+
+
+
+function post(event){
+
+    event.preventDefault();
+
+    const body = document.querySelector('#content').value;
+    fetch("/post", {
+        method:"POST",
+        body: JSON.stringify({
+            content:body,
+
+        })
+    })
+    .then(response => response.json())
+    .then(result => {
+        console.log(result)
+    })
+    .catch((error) => console.log(error));
+
+    document.querySelector("#content").value = "";
+   
+
+
 }

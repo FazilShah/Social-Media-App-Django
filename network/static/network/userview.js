@@ -2,6 +2,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     username = window.location.href.split("/")[3];
     get_user(username);
+    document.querySelector('#post-post').addEventListener('submit', post);
 })
 function get_user(username){
     
@@ -74,3 +75,29 @@ function load_user_posts(posts){
         document.querySelector('#userposts').append(div);
     })
 }
+
+
+function post(event){
+
+    event.preventDefault();
+
+    const body = document.querySelector('#content').value;
+    fetch("/post", {
+        method:"POST",
+        body: JSON.stringify({
+            content:body,
+
+        })
+    })
+    .then(response => response.json())
+    .then(result => {
+        console.log(result)
+    })
+    .catch((error) => console.log(error));
+
+    document.querySelector("#content").value = "";
+   
+
+
+}
+

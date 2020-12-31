@@ -21,13 +21,24 @@
 
    
   
-    <div id="posts-view" class="card">
+    <div id="posts-view" class="card"></div>
+        <div id="posts2-view" class="card"></div>
+    
+    <div id="page-view"></div>
+        
         
     
         
         
 
-    </div>
+    
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            {% for page in pages %}
+          <li class="page-item"><a class="page-link" id="pagination" data-page ="{{ page }}">{{ page }}</a></li>
+            {% endfor %}
+        </ul>
+      </nav>
     
    
    
