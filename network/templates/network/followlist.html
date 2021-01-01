@@ -25,5 +25,17 @@
 <div id="following-posts">
 
 </div>
+<div id="following-posts2"></div>
+<div id="page-view"></div>
+
+
+<nav aria-label="Page navigation example">
+    <ul class="pagination">
+        {% for page in pages %}
+      <li class="page-item"><a class="page-link" id="pagination" data-page ="{{ page }}">{{ page }}</a></li>
+        {% endfor %}
+    </ul>
+  </nav>
+
 
 {% endblock %}

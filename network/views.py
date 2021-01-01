@@ -24,7 +24,14 @@ def load_post(request, username, post_id):
     return render(request, 'network/postview.html')
 
 def follow_view(request):
-    return render(request, 'network/followlist.html')
+    data = User.objects.get(pk=request.user.id)
+    followers = data.followers1.all()
+    users = [User.objects.get(username=follower) for follower in followers]
+    posts = [Post.objects.filter(author=user) for user in users]
+    flat_posts = [item for sublist in posts for item in sublist]
+    paginator = Paginator(flat_posts, 10)
+    num_pages = [page for page in range(1, paginator.num_pages)]
+    return render(request, 'network/followlist.html', {'pages':num_pages})
 
 
 def login_view(request):
@@ -133,6 +140,8 @@ def like(request, post_id):
 @csrf_exempt
 def userview(request, username):
     user = User.objects.get(username=username)
+    following = user.following1.all().count()
+    followers = user.followers1.all().count()
     requesting_user = request.user
     data = user.serialize()
     if(user == requesting_user):
@@ -140,6 +149,15 @@ def userview(request, username):
     else:
         check = False
     data['check'] = check
+    data['followerCount'] = followers
+    data['followingCount'] = following
+    try:
+        user.following1.get(following_user_id = request.user.id)
+        check_follow = True
+    except:
+        
+        check_follow = False
+    data['check_follow'] = check_follow
     if request.method == 'GET':
         return JsonResponse(data)
         
@@ -151,8 +169,13 @@ def follow(request, user_id, fol):
     if request.method == 'POST':
         data = json.loads(request.body)
         user = data.get('to follow')
-        Followers.objects.create(user_id = User.objects.get(pk=user_id), following_user_id = User.objects.get(pk=request.user.id))
-        return JsonResponse({"message":"followed!"}, status=201)
+        if(fol=='follow'):
+            Followers.objects.create(user_id = User.objects.get(pk=user_id), following_user_id = User.objects.get(pk=request.user.id))
+            return JsonResponse({"message":"followed!"}, status=201)
+        elif(fol == 'unfollow'):
+            a = Followers.objects.get(user_id=User.objects.get(pk=user_id), following_user_id=User.objects.get(pk=request.user.id))
+            a.delete()
+            return JsonResponse({"message":"unfollowed successfully!"}, status=201)
     
     else:
         return JsonResponse({"error":"error"})
@@ -162,7 +185,15 @@ def followed_posts(request):
     data = User.objects.get(pk=request.user.id)
     followers = data.followers1.all()
     users = [User.objects.get(username=follower) for follower in followers]
-    return JsonResponse([user.serialize() for user in users], safe=False)
+    posts = [Post.objects.filter(author=user) for user in users]
+    flat_posts = [item for sublist in posts for item in sublist]
+
+    pagenumber = int(request.GET.get('page') or 1)
+    paginator = Paginator(flat_posts, 10)
+    pag = paginator.get_page(pagenumber)
+   
+
+    return JsonResponse([post.serialize() for post in pag], safe=False)
     
 
 

@@ -17,10 +17,10 @@ function get_user(username){
         heading.innerHTML = `${user.username}`;
         div.append(heading);
         const followers = document.createElement('h5');
-        followers.innerHTML = `Followers: ${user.followers}`;
+        followers.innerHTML = `Followers: ${user.followingCount}`;
         div.append(followers);
         const following = document.createElement('h5');
-        following.innerHTML = `Following: ${user.following}`;
+        following.innerHTML = `Following: ${user.followerCount}`;
         div.append(following);
         
         document.querySelector('#userview').append(div);
@@ -31,10 +31,18 @@ function get_user(username){
         }
         else {
             document.querySelector('#follow').style.display = 'block';
-            document.querySelector('#follow').addEventListener('click', () => follow(user.id, 'follow'));
+            if(user.check_follow === true){
+                document.querySelector('#follow').innerHTML = 'Unfollow';
+                document.querySelector('#follow').addEventListener('click', () => follow(user.id, 'unfollow'));
+            }
+            else{
+                document.querySelector('#follow').innerHTML = 'Follow';
+                document.querySelector('#follow').addEventListener('click', () => follow(user.id, 'follow'));
+            }
+            
         }
         
-        load_user_posts(user.posts);
+        load_user_posts(user,user.posts);
         
     })
 
@@ -54,17 +62,27 @@ function follow(username, follow){
     })
     .catch((error) => console.log(error));
 
-    document.querySelector('#follow').innerHTML = 'Unfollow'
+    if(follow === 'follow'){
+        document.querySelector('#follow').innerHTML = 'Unfollow';
+    }
+    else{
+        document.querySelector('#follow').innerHTML = 'Follow';
+    }
+
+    
 }
 
-function load_user_posts(posts){
+function load_user_posts(user,posts){
+
+    console.log(posts)
     
     
     posts.forEach(post => {
         const div = document.createElement('div');
         div.style.borderStyle = 'solid';
-        const heading = document.createElement('h5');
+        const heading = document.createElement('a');
         heading.innerHTML = `${post.content}`;
+        heading.href = `/${user.username}/${post.id}`;
         div.append(heading);
         const dat = document.createElement('p');
         dat.innerHTML = `${post.date}`;
