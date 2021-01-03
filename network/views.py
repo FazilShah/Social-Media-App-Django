@@ -8,6 +8,8 @@ from .models import User, Post, Followers
 import datetime
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
+from django.contrib.auth.decorators import login_required
+
 
 
 
@@ -21,8 +23,10 @@ def display_user(request, username):
     return render(request, 'network/userview.html')
 
 def load_post(request, username, post_id):
-    return render(request, 'network/postview.html')
+    return render(request, 'network/postview.html', {'id':post_id})
 
+
+@login_required
 def follow_view(request):
     data = User.objects.get(pk=request.user.id)
     followers = data.followers1.all()
@@ -53,7 +57,7 @@ def login_view(request):
     else:
         return render(request, "network/login.html")
 
-
+@login_required
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("index"))
@@ -85,7 +89,7 @@ def register(request):
     else:
         return render(request, "network/register.html")
 
-
+@csrf_exempt
 def get_posts(request):
     page_number = int(request.GET.get('page') or 1)
     posts = Post.objects.all().order_by("-dateposted")
@@ -93,6 +97,7 @@ def get_posts(request):
     pag = paginator.get_page(page_number)
     return JsonResponse([post.serialize() for post in pag], safe=False)
 
+@login_required
 @csrf_exempt
 def create_post(request):
 
@@ -128,14 +133,20 @@ def postview(request, post_id):
     if request.method == 'GET':
         return JsonResponse(post1.serialize())
 
+
+
+@login_required
 @csrf_exempt
-def like(request, post_id):
-    
-    if request.method == 'POST':
-        post = Post.objects.get(pk=post_id)
-        post.likes +=1
+def likepost(request, post_id):
+    if request.method == 'PUT':
+        data = json.loads(request.body)
+        id = data.get('id')
+        post = Post.objects.get(pk=id)    
+        post.likes = post.likes+1
         post.save()
         return JsonResponse({'message':'liked succcessfuly'})
+    else:
+        return JsonResponse({'Message':'request should be post'})
 
 @csrf_exempt
 def userview(request, username):
@@ -163,7 +174,7 @@ def userview(request, username):
         
     
 
-
+@login_required
 @csrf_exempt
 def follow(request, user_id, fol):
     if request.method == 'POST':
@@ -180,7 +191,7 @@ def follow(request, user_id, fol):
     else:
         return JsonResponse({"error":"error"})
 
-
+@login_required
 def followed_posts(request):
     data = User.objects.get(pk=request.user.id)
     followers = data.followers1.all()

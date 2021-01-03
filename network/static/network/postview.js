@@ -2,7 +2,28 @@ document.addEventListener('DOMContentLoaded', () => {
     id = window.location.href.split("/")[4]
     get_post(id);
     document.querySelector('#post-post').addEventListener('submit', post);
+    
+
 })
+
+function like(id){
+  
+
+    fetch(`/likepost/${id}`, {
+        method:'PUT',
+        body: JSON.stringify({
+            'id':id
+        })
+    })
+
+
+    
+    .then(response => response.json())
+    .then(result => {
+        console.log(result)
+    })
+
+}
 
 
 function get_post(post_id){

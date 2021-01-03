@@ -1,17 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     document.querySelector('#post-post').addEventListener('submit', post);
     get_posts();
-    document.querySelectorAll('#like').forEach(button => {
-        button.addEventListener('click', () => {
-            fetch(`/like/${this.dataset.id}`, {
-                method:'POST',
-                body: JSON.stringify({
-                    "id": this.dataset.id
-                })
-            })
-        })
-    })
-  
+    
     document.querySelectorAll('#pagination').forEach(function(a){
 
         a.onclick = function(){
@@ -58,13 +48,6 @@ function layout(post){
             const datey = document.createElement('p');
             datey.innerHTML = `${post.date}`;
             div.append(datey);
-            const button = document.createElement('input');
-            button.value = 'Like';
-            button.className = "btn btn-primary";
-            button.type = 'submit'
-            button.dataset.id = `${post.id}`;
-            button.id = 'like';
-            div.append(button);
             const liky = document.createElement('p');
             liky.innerHTML = `Likes: ${post.likes}`;
             div.append(liky);
@@ -132,6 +115,8 @@ function post(event){
 
 
 }
+
+
 
 
 
